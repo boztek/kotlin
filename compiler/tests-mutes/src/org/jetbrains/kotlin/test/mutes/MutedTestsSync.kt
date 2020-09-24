@@ -19,8 +19,8 @@ fun main() {
 fun syncMutedTestsOnTeamCityWithDatabase() {
     val remotelyMutedTests = RemotelyMutedTests()
     val locallyMutedTests = LocallyMutedTests()
-    val bunches = Bunches.parseRulesToBunches(locallyMutedTests.tests.keys)
 
+    val bunches = Bunches.parseRulesToBunches(locallyMutedTests.tests.keys)
     syncMutedTests(remotelyMutedTests.projectTests, locallyMutedTests.projectTests)
 
     for ((originalBunchId, foundBunchId) in bunches) {
