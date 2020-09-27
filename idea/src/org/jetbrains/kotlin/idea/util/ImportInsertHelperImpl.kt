@@ -404,7 +404,7 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
                 val newDirective = psiFactory.createImportDirective(importPath)
                 val imports = importList.imports
                 return if (imports.isEmpty()) { //TODO: strange hack
-                    importList.add(psiFactory.createNewLine())
+                    importList.add(psiFactory.createNewLine(lineBreaks = 1))
                     importList.add(newDirective) as KtImportDirective
                 } else {
                     val importPathComparator = ImportInsertHelperImpl(project).importSortComparator
@@ -413,7 +413,13 @@ class ImportInsertHelperImpl(private val project: Project) : ImportInsertHelper(
                             val directivePath = it.importPath
                             directivePath != null && importPathComparator.compare(directivePath, importPath) <= 0
                         }
-                    importList.addAfter(newDirective, insertAfter) as KtImportDirective
+                    val nextSibling = insertAfter?.nextSibling
+                    val newLineAfterExistedImport = nextSibling ?: importList.addAfter(psiFactory.createNewLine(), insertAfter)
+                    val ktImportDirective = importList.addAfter(newDirective, newLineAfterExistedImport) as KtImportDirective
+                    nextSibling?.let {
+                        importList.addAfter(psiFactory.createNewLine(lineBreaks = 1), ktImportDirective)
+                    }
+                    ktImportDirective
                 }
             } else {
                 error("Trying to insert import $fqName into a file ${file.name} of type ${file::class.java} with no import list.")
